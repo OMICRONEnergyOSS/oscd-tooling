@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import { runBinaryAndExit } from "../core/runBinary.js";
 import { gitHooksCheckHealth, gitHooksInstall } from "./gitHooks.js";
 import chalk from "chalk";
 
@@ -10,7 +9,7 @@ import chalk from "chalk";
  * The idea is to help maintain a consistent setup across consumer projects and reduce friction in onboarding new projects.
  */
 
-interface DoctorOptions {
+interface CheckupOptions {
   fix?: boolean;
 }
 
@@ -31,25 +30,23 @@ const unwantedDeps = [
   "@commitlint/config-conventional",
 ];
 
-export async function doctor(opts: DoctorOptions = {}) {
+export async function checkup(opts: CheckupOptions = {}) {
   const fix = !!(opts && opts.fix);
-  console.log(chalk.blue("Doctor is running checks..."));
+  console.log(chalk.blue("Check-Up is running checks..."));
   const pkgPath = path.resolve(process.cwd(), "package.json");
   if (!fs.existsSync(pkgPath)) {
     console.error(
       chalk.red(
-        `Error: No package.json at ${pkgPath}. Doctor checks require a package.json to validate scripts and dependencies.`,
+        `Error: No package.json at ${pkgPath}. Check-Up requires a package.json to validate scripts and dependencies.`,
       ),
     );
     process.exit(1);
   }
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
-  let hasFixes = false;
   for (const s of packageJSonExpectedScripts) {
     if (!pkg.scripts || !pkg.scripts[s]) {
       console.warn(chalk.yellow(`Missing script: ${s}`));
       if (fix) {
-        hasFixes = true;
         pkg.scripts = pkg.scripts || {};
         pkg.scripts[s] = `oscd ${s}`;
         console.log(chalk.green(`Added script "${s}": "oscd ${s}"`));
@@ -67,11 +64,9 @@ export async function doctor(opts: DoctorOptions = {}) {
       );
       if (fix) {
         if (pkg.devDependencies && pkg.devDependencies[d]) {
-          hasFixes = true;
           delete pkg.devDependencies[d];
         }
         if (pkg.dependencies && pkg.dependencies[d]) {
-          hasFixes = true;
           delete pkg.dependencies[d];
         }
         console.log(
@@ -99,5 +94,5 @@ export async function doctor(opts: DoctorOptions = {}) {
     }
   }
 
-  console.log(chalk.green("Doctor checks complete."));
+  console.log(chalk.green("Check-up checks complete."));
 }

@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { spawnSync } from 'node:child_process';
 
 export interface RunResult {
@@ -19,7 +20,10 @@ export function runBinary(command: string, args: string[] = []): RunResult {
   };
 }
 
-export function runBinaryAndExit(command: string, args: string[] = []): void {
+export function runBinaryAndExit(command: string, args: string[] = [], label?: string): void {
+  if (label){
+    console.log(chalk.blue(`Running ${label}...`));
+  }
   const result = runBinary(command, args);
 
   if (result.error) {
@@ -28,8 +32,18 @@ export function runBinaryAndExit(command: string, args: string[] = []): void {
   }
 
   if (result.status !== 0) {
+    if (label){
+      console.log(`${label} failed with return code ${result.status}`);
+    }
     process.exit(result.status ?? 1);
   }
+  if (label){
+    console.log(chalk.green(`${label} completed successfully.`));
+  }
+}
+
+export function runNodeScriptAndExit(script: string, args: string[] = [], label?: string): void {
+  runBinaryAndExit(process.execPath, [script, ...args], label);
 }
 
 export function runBinaryCapture(

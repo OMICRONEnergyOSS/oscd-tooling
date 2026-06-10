@@ -1,71 +1,251 @@
-# @omicronenergy/oscd-tooling (prototype)
+# @omicronenergy/oscd-tooling
 
-Minimal prototype of the `oscd` centralized tooling CLI that exposes shared configs and commands.
+Centralized development tooling for OpenSCD plugins.
 
-## The idea
+The `oscd` CLI owns the shared build, lint, test, bundle, deploy, and browser-test tooling so individual plugin repositories can keep their dev dependencies and configuration small.
 
-All of the OpenSCD plugins need to have the same tooling - ideally, built, tested and bundled with the same versions of tools.
-This module aims to move as much tooling boiler plate from the individual projects to this module. Developers then don't need to manage each of the plugins tooling chain. When tool updates require changes to configuration, this now happens in the one place, allowing plugin developers upgrade to the latest version of this module without needing to change anything in their project.
+## Goals
 
-This should result in:
+- Make the maintenance of multiple OpenSCD plugins more manageable by centralizing shared development tooling.
+- Keep tool versions consistent across plugin repositories.
+- Move repeated scripts and configuration into one package.
+- Let plugin repositories depend on `@omicronenergy/oscd-tooling` instead of declaring every tool directly.
 
-- dramatically reduced set of dependencies in each project
-- less config files in each repo
-- consistency accross plugins - once you know how everything is in one plugin, you know how it is in all the others (assuming their all using the this module!)
+## Consumer Setup
 
-## Additional Features
+Install the tooling package as a dev dependency:
 
-### Plugin Doctor
+```json
+{
+  "devDependencies": {
+    "@omicronenergy/oscd-tooling": "^0.0.1"
+  }
+}
+```
 
-By running `oscd doctor` the tool will check for specific configurations, tools and versions and point out anything you may need to change.
--- DISCLAIMER -- this is currently "proof of concept" the actual rule currently in place are dribble - its skeleton code at best, but hopefully will mature really soon to be helpful when revisiting a project you've not been working on for a time.
+Recommended consumer scripts:
 
-Plugin Doctor --fix: Issues which are simple to fix, can be fixed. This is even more vague right now -
+```json
+{
+  "scripts": {
+    "lint": "oscd lint",
+    "format": "oscd lint --format",
+    "analyze": "oscd analyze",
+    "build": "oscd build",
+    "bundle": "oscd bundle",
+    "test": "oscd test",
+    "test:watch": "oscd test --watch",
+    "test:visual": "oscd test --visual",
+    "test:update": "oscd test --update",
+    "start": "oscd start",
+    "start:bundle": "oscd start-bundle",
+    "updates": "oscd updates",
+    "deploy": "oscd deploy",
+    "prepare": "oscd install-hooks"
+  }
+}
+```
 
-##
+Projects can still add package-specific scripts around these commands when they need extra generated assets.
+For example, if a project must generate an asset into `dist` between cleaning and bundling, it can use `oscd clean && <generate-assets> && oscd bundle --no-clean`.
 
-## What this contains
+## Migrating a Plugin
 
-- `bin/oscd.js` — tiny CLI wrapper that runs tools from the calling project, pointing them at shared configs.
-- `configs/` — shared config files: `base.tsconfig.json`, `eslint.config.js`, `rollup.config.js`, `commitlint.config.js`
-- `core/` — helper utilities used by the CLI
+When moving an existing plugin to `@omicronenergy/oscd-tooling`, keep the plugin-specific runtime dependencies, but remove toolchain dependencies that are now owned by this package.
 
-## Quick start (experimenting locally)
+Dev dependencies usually no longer needed in the plugin:
 
-1. Download and extract this package.
-2. In a consuming project run:
-   ```json
-   // package.json
-   {
-     "devDependencies": {
-       "@omicronenergy/oscd-tooling": "file:../path/to/oscd-tooling"
-     },
-     "scripts": {
-       "lint": "oscd --lint",
-       "test": "oscd --test",
-       "build": "oscd --build"
-     }
-   }
-   ```
-3. From the consuming project run `npm install` and then `npm run lint`. The CLI will run ESLint on your project using the shared config.
+- ESLint packages: `eslint`, `@eslint/js`, `@typescript-eslint/*`, `@stylistic/eslint-plugin`, `eslint-plugin-*`
+- Build and bundle tools: `typescript`, `rollup`, `@rollup/plugin-*`, `rollup-plugin-*`, `rimraf`, `concurrently`
+- Test runner tools: `@web/test-runner`, `@web/test-runner-*`, `@web/dev-server*`
+- Analysis and docs tools: `@custom-elements-manifest/analyzer`, `typedoc`
+- Release and hook tools: `gh-pages`, `husky`, `commitlint`, `@commitlint/*`, `lint-staged`
+- Browser test tooling: `playwright` when it is only needed by Web Test Runner
 
-## Notes & design choices
+Files usually removable from the plugin:
 
-- The CLI executes tools with `process.cwd()` as the working directory, so it analyzes the consuming repo.
-- Config files are provided under `configs/`. You can reference them from your local project by extending:
+- `rollup.config.js`
+- `web-test-runner.config.js`
+- `web-dev-server.config.js`
+- `commitlint.config.js`
+- `.husky/`
+
+Files usually kept, but simplified:
+
+- `tsconfig.json`: extend the shared base config, but keep project-relative paths locally.
+- `package.json`: keep plugin metadata, runtime dependencies, exports, files, project-specific scripts, and the `@omicronenergy/oscd-tooling` dev dependency.
+- `.githooks/`: generated by `oscd install-hooks`; keep the generated `pre-commit` and `commit-msg` hooks if they are committed.
+- `.github/workflows/*`: keep CI/release workflows unless those are moved to shared GitHub workflow templates separately.
+- `.editorconfig`, `.gitignore`, release config, README, and plugin-specific docs.
+
+Minimal `tsconfig.json` for most plugins:
+
+```json
+{
+  "extends": "@omicronenergy/oscd-tooling/configs/base.tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"]
+}
+```
+
+Do not move `rootDir`, `outDir`, or `include` into the shared base config. TypeScript resolves relative paths from the config file that declares them, so these must stay in each consuming project.
+
+Optional local files:
+
+- `eslint.config.js`: not required by `oscd lint`, but useful for editor integrations. If kept, make it a thin wrapper:
+
+  ```js
+  import oscdEsLintConfig from '@omicronenergy/oscd-tooling/configs/eslint.config.js';
+
+  export default [...oscdEsLintConfig];
+  ```
+
+- Project-specific generated assets: keep local scripts around `oscd` commands. For example:
+
   ```json
-  // tsconfig.json
   {
-    "extends": "node_modules/@omicronenergy/oscd-tooling/configs/base.tsconfig.json",
-    "compilerOptions": { "outDir": "dist" }
+    "scripts": {
+      "marked": "marked -i src/about.md -o src/about.html && cp src/about.html dist/about.html",
+      "build": "oscd build && npm run marked",
+      "bundle": "oscd clean && npm run marked && oscd bundle --no-clean"
+    }
   }
   ```
-- `rollup.config.js` exports a factory function so a consuming repo can `import base from '@omicronenergy/oscd-tooling/configs/rollup.config.js'; export default base({ input: 'src/index.ts' })`
 
-## Limitations
+Direct test imports still matter. If test source imports a package directly, for example `import { spy } from 'sinon'`, that package is part of the plugin's test source dependency graph and should remain declared in the plugin unless it is re-exported through a shared testing API.
+The same applies to `@open-wc/testing` if tests import `fixture`, `expect`, or other helpers from it directly.
 
-- This is a prototype — so far only lint (and commitlint has been tested).
+## Commands
 
-## Future
+`oscd lint`
 
-When
+Runs ESLint using the shared ESLint config from this package.
+
+Useful options:
+
+```sh
+oscd lint --format
+```
+
+`--format` runs ESLint with automatic fixes enabled.
+
+`oscd analyze`
+
+Runs Custom Elements Manifest analysis for the consuming plugin.
+
+`oscd build`
+
+Runs `clean`, then the TypeScript build in the consuming repository.
+
+Useful options:
+
+```sh
+oscd build --analyze
+oscd build --no-clean
+```
+
+`--analyze` runs Custom Elements Manifest analysis before the TypeScript build. Analysis is not run by default.
+
+`oscd clean`
+
+Removes generated build output from `dist`, while preserving snapshot output.
+
+`oscd bundle`
+
+Runs `clean`, then Rollup using the shared Rollup config.
+
+Useful options:
+
+```sh
+oscd bundle --analyze
+oscd bundle --no-clean
+```
+
+`--analyze` runs Custom Elements Manifest analysis before bundling. Analysis is not run by default.
+
+`oscd test`
+
+Builds the consuming project and runs Web Test Runner using the shared WTR config.
+
+Useful options:
+
+```sh
+oscd test --watch
+oscd test --visual
+oscd test --update
+```
+
+`oscd start`
+
+Runs the development build/watch server. Pass `--analyze` to run Custom Elements Manifest analysis before the initial build.
+
+`oscd start-bundle`
+
+Runs the bundled development server. Pass `--analyze` to run Custom Elements Manifest analysis before the initial bundle.
+
+`oscd versions`
+
+Prints the versions of the tooling packages resolved from `@omicronenergy/oscd-tooling`.
+
+`oscd updates`
+
+Runs `npm-check-updates --interactive` from the centralized tooling dependency.
+
+`oscd install-hooks`
+
+Installs the Git hooks expected by the tooling package.
+
+`oscd install-playwright`
+
+Runs `playwright install --with-deps` from the centralized Playwright dependency.
+
+`oscd commitlint`
+
+Runs commitlint. This is primarily intended for Git hooks.
+
+`oscd deploy`
+
+Deploys the bundled plugin output with `gh-pages`.
+
+## Shared Configs
+
+The package exposes shared configs under `configs/`:
+
+- `base.tsconfig.json`
+- `eslint.config.js`
+- `rollup.config.js`
+- `commitlint.config.js`
+- `web-test-runner.config.js`
+- `lint-staged.config.js`
+
+Consumer TypeScript configs should extend the shared base config:
+
+```json
+{
+  "extends": "@omicronenergy/oscd-tooling/configs/base.tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"]
+}
+```
+
+The base config also centralizes test type visibility, such as Mocha globals, through the tooling package.
+
+## Dependency Model
+
+Tools executed by `oscd` are dependencies of this package. The CLI resolves those tools from `@omicronenergy/oscd-tooling` and executes them with the consuming repository as `process.cwd()`.
+
+This means plugin repositories generally do not need direct dev dependencies for tools such as ESLint, Rollup, TypeScript, Web Test Runner, Playwright, or Custom Elements Manifest Analyzer.
+
+Code imported directly by plugin source or test files is different. If a plugin test imports a package by name, for example `import { spy } from 'sinon'`, then that package must either be a direct dependency of the plugin repository or be re-exported through an explicit shared testing API.
+
+## Notes
+
+- `oscd install-playwright` may require elevated system permissions on Linux because Playwright's `--with-deps` can install OS packages.
+- `oscd updates` is interactive and is intended to be run manually.
+- Commands are designed to run from the consuming repository, not from the tooling package directory.

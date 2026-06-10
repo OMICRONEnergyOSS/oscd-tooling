@@ -1,13 +1,19 @@
-import { runBinaryAndExit } from "../core/runBinary.js";
-import { resolveToolConfig } from "../core/resolver.js";
+import { runNodeScriptAndExit } from "../core/runBinary.js";
+import { resolvePackageBin, resolveToolConfig } from "../core/resolver.js";
 
-export async function lint() {
+const eslintBin = resolvePackageBin("eslint", "eslint");
+
+export interface LintOptions {
+  format?: boolean;
+}
+
+export async function lint(options: LintOptions = {}, files: string[] = []) {
   const config = resolveToolConfig("eslint.config.js");
-  runBinaryAndExit("eslint", [
-    ".",
+  runNodeScriptAndExit(eslintBin, [
+    ...(files.length ? files : ["."]),
     "--config",
     config,
-    "--ext",
-    ".ts,.js,.tsx,.jsx",
+    ...(!files.length ? ["--ext", ".ts,.js,.tsx,.jsx"] : []),
+    ...(options.format ? ["--fix"] : []),
   ]);
 }

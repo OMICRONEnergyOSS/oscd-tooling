@@ -1,16 +1,24 @@
-import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import { resolvePackagePath } from './resolver.js';
 
-function runAndCapture(cmd: string, args: string[]) {
-  const r = spawnSync(cmd, args, { encoding: 'utf8', env: process.env, shell: process.platform === 'win32' });
-  if (r.error) return `${cmd} not available`;
-  return r.stdout?.trim() || r.stderr?.trim() || 'unknown';
+function packageVersion(pkg: string) {
+  try {
+    const packageJson = JSON.parse(
+      fs.readFileSync(resolvePackagePath(pkg, 'package.json'), 'utf8'),
+    );
+    return packageJson.version ?? 'unknown';
+  } catch {
+    return 'not available';
+  }
 }
 
 export async function versionInfo() {
   console.log('Tool versions:');
   console.log('node:', process.version);
-  console.log('eslint:', runAndCapture('eslint', ['--version']));
-  console.log('rollup:', runAndCapture('rollup', ['--version']));
-  console.log('vitest:', runAndCapture('vitest', ['--version']));
-  console.log('typescript:', runAndCapture('tsc', ['--version']));
+  console.log('eslint:', packageVersion('eslint'));
+  console.log('rollup:', packageVersion('rollup'));
+  console.log('typescript:', packageVersion('typescript'));
+  console.log('web-test-runner:', packageVersion('@web/test-runner'));
+  console.log('web-test-runner-playwright:', packageVersion('@web/test-runner-playwright'));
+  console.log('playwright:', packageVersion('playwright'));
 }

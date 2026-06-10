@@ -1,7 +1,34 @@
-import { runBinaryAndExit } from "../core/runBinary.js";
-import { resolveToolConfig } from "../core/resolver.js";
+import { runNodeScriptAndExit } from "../core/runBinary.js";
+import { resolvePackageBin, resolveToolConfig } from "../core/resolver.js";
+import { build } from "./build.js";
 
-export async function testCmd() {
-  const cfg = resolveToolConfig("vitest.config.js");
-  runBinaryAndExit("vitest", ["run", "--config", cfg]);
+const wtrBin = resolvePackageBin("@web/test-runner", "wtr");
+const config = resolveToolConfig("web-test-runner.config.js");
+
+export interface TestOptions {
+  watch?: boolean;
+  update?: boolean;
+  visual?: boolean;
+}
+
+export async function testCmd(options: TestOptions= {}) {
+  build();
+  if (options.visual || options.update){
+
+    runNodeScriptAndExit(wtrBin, [
+      "--config",
+      config,
+      "--group",
+      "visual",
+      ...(options.update ? ["--update-visual-baseline"]:[])
+    ], `Visual Regression Testing ${options.update ? "(updating baseline)":""}`);
+  }else {
+    runNodeScriptAndExit(wtrBin, [
+      "--config",
+      config,
+      "--group",
+      "unit",
+      ...(options.watch ? ["--watch"]:[])
+    ], `Unit Testing`);
+  }
 }

@@ -1,11 +1,11 @@
-import { resolveToolConfig, resolveToolExecutable } from "../core/resolver.js";
-import { runBinaryAndExit } from "../core/runBinary.js";
+import { resolvePackageBin, resolveToolConfig } from "../core/resolver.js";
+import { runNodeScriptAndExit } from "../core/runBinary.js";
 
 interface CommitlintOptions {
   edit?: string;
 }
 
-const commitlintPath = resolveToolExecutable("@commitlint/cli", "cli.js");
+const commitlintPath = resolvePackageBin("@commitlint/cli", "commitlint");
 const configPath = resolveToolConfig("commitlint.config.js");
 
 export async function commitlintCommand(opts: CommitlintOptions = {}) {
@@ -16,5 +16,5 @@ export async function commitlintCommand(opts: CommitlintOptions = {}) {
   } else {
     args.push("--from", "HEAD~1"); // fallback: lint last commit message
   }
-  runBinaryAndExit(commitlintPath, args);
+  runNodeScriptAndExit(commitlintPath, args);
 }
