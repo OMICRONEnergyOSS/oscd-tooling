@@ -21,6 +21,6 @@ export async function start({build: buildOption, ...rest}: StartOptions = {}) {
     "-k",
     "-r",
     `"${nodeCommand(tscBin, ["--watch", "--preserveWatchOutput"])}"`,
-    `"${nodeCommand(wdsBin, ["--node-resolve"])}"`,
+    `"${nodeCommand(wdsBin, ["--node-resolve", "--root-dir", "./", "--open", "./demo/"])}"`,
   ], "Development Server");
 }

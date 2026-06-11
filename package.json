@@ -20,8 +20,7 @@
     "build:watch": "tsc -w",
     "prepublishOnly": "npm run build",
     "lint": "eslint . --ext .ts",
-    "format": "eslint . --fix",
-    "test": "node --no-warnings ./dist/oscd.js checkup"
+    "format": "eslint . --fix"
   },
   "keywords": [
     "oscd",
@@ -67,10 +66,10 @@
     "eslint-plugin-tsdoc": "^0.5.2",
     "eslint-plugin-wc": "^3.1.0",
     "gh-pages": "^6.3.0",
-    "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "npm-check-updates": "^22.2.3",
     "pixelmatch": "^7.1.0",
+    "playwright": "1.59.1",
     "pngjs": "^7.0.0",
     "prettier": "^3.7.4",
     "rimraf": "^6.1.2",
@@ -79,8 +78,5 @@
     "sinon": "^21.0.0",
     "typedoc": "^0.28.15",
     "typescript": "^5.9.3"
-  },
-  "overrides": {
-    "playwright": "1.59.1"
   }
 }
