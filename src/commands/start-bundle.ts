@@ -19,7 +19,7 @@ export async function startBundle({build: buildOption, ...rest}: StartOptions = 
   runNodeScriptAndExit(concurrentlyBin, [
     "-k",
     "-r",
-    nodeCommand(rollupBin, ["-c", rollupConfig, "--watch"]),
-    nodeCommand(wdsBin, ["--root-dir", "./dist"]),
+    `"${nodeCommand(rollupBin, ["-c", rollupConfig, "--watch"])}"`,
+    `"${nodeCommand(wdsBin, ["--root-dir", "./dist", "--open", "./demo/"])}"`,
   ], "Bundled Serve");
 }
