@@ -20,6 +20,6 @@ export async function startBundle({build: buildOption, ...rest}: StartOptions = 
     "-k",
     "-r",
     `"${nodeCommand(rollupBin, ["-c", rollupConfig, "--watch"])}"`,
-    `"${nodeCommand(wdsBin, ["--root-dir", "./dist", "--open", "./demo/"])}"`,
+    `"${nodeCommand(wdsBin, ["--root-dir", "./dist", "--watch", "--open", "./demo/"])}"`,
   ], "Bundled Serve");
 }
