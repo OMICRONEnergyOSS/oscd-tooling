@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.2...oscd-tooling-v0.0.3) (2026-06-12)
+
+
+### Bug Fixes
+
+* add watch flag to wds commands (start & start-bundle) ([0568f80](https://github.com/OMICRONEnergyOSS/oscd-tooling/commit/0568f809511f131f281372189e422dc296dd7e03))
+
 ## [0.0.2](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.1...oscd-tooling-v0.0.2) (2026-06-11)
 
 
