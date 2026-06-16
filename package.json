@@ -1,6 +1,6 @@
 {
   "name": "@omicronenergy/oscd-tooling",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Centralized tooling and CLI for OMICRON Energy OSS plugins (prototype).",
   "repository": {
     "type": "git",

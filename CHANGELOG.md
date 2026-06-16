@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.3...oscd-tooling-v0.0.4) (2026-06-16)
+
+
+### Bug Fixes
+
+* add missing -- to branch parameter ([aaacc49](https://github.com/OMICRONEnergyOSS/oscd-tooling/commit/aaacc49b731dff11e5d8f02b7159ddee3e9a0d49))
+
 ## [0.0.3](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.2...oscd-tooling-v0.0.3) (2026-06-12)
 
 
