@@ -8,11 +8,11 @@ interface DeployOptions {
 }
 
 export async function deploy(options: DeployOptions = {}) {
-  const branch = options.branch ?? "deploy";
+  const branch = options.branch ?? "deploy"; //this aligns with oscd-gh-workflows
   runNodeScriptAndExit(ghPagesBin, [
     "--dist",
     "dist",
-    "branch",
+    "--branch",
     branch,
   ], "Deploy to GH"); 
 }
