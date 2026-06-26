@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.4...oscd-tooling-v0.0.5) (2026-06-26)
+
+
+### Bug Fixes
+
+* add coverage flag to testing ([b85437f](https://github.com/OMICRONEnergyOSS/oscd-tooling/commit/b85437f59891eb2168938868028ff913dbfe5657))
+
 ## [0.0.4](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.3...oscd-tooling-v0.0.4) (2026-06-16)
 
 
