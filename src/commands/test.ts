@@ -20,6 +20,7 @@ export async function testCmd(options: TestOptions= {}) {
       config,
       "--group",
       "visual",
+      "--coverage",
       ...(options.update ? ["--update-visual-baseline"]:[])
     ], `Visual Regression Testing ${options.update ? "(updating baseline)":""}`);
   }else {
@@ -28,6 +29,7 @@ export async function testCmd(options: TestOptions= {}) {
       config,
       "--group",
       "unit",
+      "--coverage",
       ...(options.watch ? ["--watch"]:[])
     ], `Unit Testing`);
   }
