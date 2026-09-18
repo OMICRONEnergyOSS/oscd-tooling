@@ -20,7 +20,7 @@ export async function start({build: buildOption, ...rest}: StartOptions = {}) {
   runNodeScriptAndExit(concurrentlyBin, [
     "-k",
     "-r",
-    `"${nodeCommand(tscBin, ["--watch", "--preserveWatchOutput"])}"`,
-    `"${nodeCommand(wdsBin, ["--node-resolve", "--root-dir", "./", "--watch", "--open", "./demo/"])}"`,
+    nodeCommand(tscBin, ["--watch", "--preserveWatchOutput"]),
+    nodeCommand(wdsBin, ["--node-resolve", "--root-dir", "./", "--watch", "--open", "./demo/"]),
   ], "Development Server");
 }
