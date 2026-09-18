@@ -123,9 +123,13 @@ export async function main(argv: string[]) {
 
   program
     .command("updates")
-    .description("Interactively check dependency updates")
-    .action(async () => {
-      await updates();
+    .description("Check dependency updates (interactive by default)")
+    .option(
+      "--write",
+      "Apply allowed upgrades to package.json and run npm install, non-interactively",
+    )
+    .action(async (opts) => {
+      await updates(opts);
     });
 
   // commitlint related
