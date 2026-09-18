@@ -40,6 +40,7 @@ Recommended consumer scripts:
     "start": "oscd start",
     "start:bundle": "oscd start-bundle",
     "updates": "oscd updates",
+    "updates:write": "oscd updates --write",
     "deploy": "oscd deploy",
     "prepare": "oscd install-hooks"
   }
@@ -192,7 +193,22 @@ Prints the versions of the tooling packages resolved from `@omicronenergy/oscd-t
 
 `oscd updates`
 
-Runs `npm-check-updates --interactive` from the centralized tooling dependency.
+Runs `npm-check-updates` (ncu) from the centralized tooling dependency, using the
+shared `ncurc.config.js` policy (see [Dependency Update Policy](#dependency-update-policy)
+below).
+
+Without options, it runs `ncu --interactive`, so upgrades allowed by the policy can
+still be picked and choosen from manually.
+
+Useful options:
+
+```sh
+oscd updates --write
+```
+
+`--write` applies every upgrade the policy allows directly to `package.json` and runs
+`npm install`, non-interactively. Intended for a scripted/CI-friendly "safe update"
+flow, e.g. a `postinstall`-free periodic job or a local `npm run update` script.
 
 `oscd install-hooks`
 
@@ -220,6 +236,7 @@ The package exposes shared configs under `configs/`:
 - `commitlint.config.js`
 - `web-test-runner.config.js`
 - `lint-staged.config.js`
+- `ncurc.config.js`
 
 These are defaults, not requirements. `oscd` resolves each tool's config from
 the consuming repo first and only falls back to the shared config when no
@@ -227,9 +244,9 @@ local file is present:
 
 - **Override** — drop a file with the same name (e.g. `rollup.config.js`,
   `web-test-runner.config.js`, `eslint.config.js`, `commitlint.config.js`,
-  `lint-staged.config.js`) at the repo root. `oscd` picks it up automatically
-  and uses it in place of the shared default, no CLI flags needed. Useful when
-  a project's needs (multi-entry bundling, custom test harness HTML, etc.)
+  `lint-staged.config.js`, `ncurc.config.js`) at the repo root. `oscd` picks it up
+  automatically and uses it in place of the shared default, no CLI flags needed. Useful
+  when a project's needs (multi-entry bundling, custom test harness HTML, etc.)
   genuinely diverge from the shared default.
 - **Extend** — import the shared config from
   `@omicronenergy/oscd-tooling/configs/<name>` inside your own local config
@@ -261,6 +278,46 @@ Consumer TypeScript configs should extend the shared base config:
 
 The base config also centralizes test type visibility, such as Mocha globals, through the tooling package.
 
+## Dependency Update Policy
+
+`oscd updates` (and this package's own `npm run update` / `npm run updates` scripts)
+resolve their target versions from `configs/ncurc.config.js`, a shared
+[npm-check-updates](https://github.com/raineorshine/npm-check-updates) config.
+
+By default, `ncu` proposes the `latest` version of every dependency, major bumps
+included. `latest` is not always safe: a dependency's newest major release can be
+incompatible with the rest of the toolchain even though `ncu` has no way to know that.
+For example, `typescript-eslint` declares a peer dependency of
+`"typescript": ">=4.8.4 <6.1.0"` (the upper bound is exclusive), but `typescript@latest`
+on npm is already `7.x` (the new native/Go compiler) - blindly taking that upgrade
+breaks linting outright. TypeScript is pinned to `~6.0.3`, the newest release that still
+satisfies typescript-eslint's peer range, with a `~` (patch-only) range so it can't
+silently drift to the unsupported `6.1.x`.
+
+`configs/ncurc.config.js` encodes this as a small, explicit, per-package `target`
+function: most packages default to `latest`, but a short, curated list is held back
+because either:
+
+- a major (or, for `typescript`, even a minor) bump is *known* to break the toolchain
+  today, or
+- the package belongs to a family that must be upgraded together, deliberately, and
+  tested as a group rather than piecemeal (e.g. the `@web/test-runner*` /
+  `@web/dev-server*` family, and `@open-wc/testing`).
+
+The list is intentionally conservative and will go stale as upstream packages resolve
+these constraints; remove an entry once the underlying incompatibility is fixed and the
+upgrade has been verified.
+
+This is only a default, not a hard requirement. Consumers can drop their own
+`ncurc.config.js` at their repo root, or extend the shared one:
+
+```js
+// ncurc.config.js
+import base from '@omicronenergy/oscd-tooling/configs/ncurc.config.js';
+
+export default { ...base, reject: ['some-pinned-package'] };
+```
+
 ## Dependency Model
 
 Tools executed by `oscd` are dependencies of this package. The CLI resolves those tools from `@omicronenergy/oscd-tooling` and executes them with the consuming repository as `process.cwd()`.
@@ -272,5 +329,7 @@ Code imported directly by plugin source or test files is different. If a plugin 
 ## Notes
 
 - `oscd install-playwright` may require elevated system permissions on Linux because Playwright's `--with-deps` can install OS packages.
-- `oscd updates` is interactive and is intended to be run manually.
+- `oscd updates` is interactive by default and intended to be run manually; use
+  `oscd updates --write` for a non-interactive, scriptable/CI-friendly upgrade that
+  still respects the shared `ncurc.config.js` policy.
 - Commands are designed to run from the consuming repository, not from the tooling package directory.
