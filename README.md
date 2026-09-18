@@ -221,6 +221,31 @@ The package exposes shared configs under `configs/`:
 - `web-test-runner.config.js`
 - `lint-staged.config.js`
 
+These are defaults, not requirements. `oscd` resolves each tool's config from
+the consuming repo first and only falls back to the shared config when no
+local file is present:
+
+- **Override** — drop a file with the same name (e.g. `rollup.config.js`,
+  `web-test-runner.config.js`, `eslint.config.js`, `commitlint.config.js`,
+  `lint-staged.config.js`) at the repo root. `oscd` picks it up automatically
+  and uses it in place of the shared default, no CLI flags needed. Useful when
+  a project's needs (multi-entry bundling, custom test harness HTML, etc.)
+  genuinely diverge from the shared default.
+- **Extend** — import the shared config from
+  `@omicronenergy/oscd-tooling/configs/<name>` inside your own local config
+  file and compose with it, instead of replacing it wholesale:
+
+  ```js
+  // rollup.config.js
+  import base from '@omicronenergy/oscd-tooling/configs/rollup.config.js';
+
+  export default [...base, /* extra entry */];
+  ```
+
+  This keeps you aligned with tooling's defaults (and their future updates)
+  while adding project-specific pieces on top. All files under `configs/` are
+  published for this purpose.
+
 Consumer TypeScript configs should extend the shared base config:
 
 ```json
