@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.6](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.5...oscd-tooling-v0.0.6) (2026-09-18)
+
+
+### Features
+
+* extend ncu handling to use bundled (overridable) config ([1c973fe](https://github.com/OMICRONEnergyOSS/oscd-tooling/commit/1c973fe3005d77528f8718d9b7ab84ded478e3cc))
+* tools now favor local config files over oscd-tools bundled (default) configs ([6dcd75b](https://github.com/OMICRONEnergyOSS/oscd-tooling/commit/6dcd75b2c8e7d9562f87984421e739ad30af63b8))
+
 ## [0.0.5](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.4...oscd-tooling-v0.0.5) (2026-06-26)
 
 
