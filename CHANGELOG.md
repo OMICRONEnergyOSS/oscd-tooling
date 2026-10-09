@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.6...oscd-tooling-v0.0.7) (2026-10-09)
+
+
+### Bug Fixes
+
+* correct CLI globs and surface Git configuration errors ([6c45d53](https://github.com/OMICRONEnergyOSS/oscd-tooling/commit/6c45d53ac9aab0d25108c425d9ecb5a4af1731e6))
+
 ## [0.0.6](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.5...oscd-tooling-v0.0.6) (2026-09-18)
 
 
