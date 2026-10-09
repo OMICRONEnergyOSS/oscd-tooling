@@ -49,7 +49,7 @@ export function runNodeScriptAndExit(script: string, args: string[] = [], label?
 export function runBinaryCapture(
   command: string,
   args: string[] = []
-): { status: number | null; stdout: string; stderr: string } {
+): RunResult & { stdout: string; stderr: string } {
   const result = spawnSync(command, args, {
     cwd: process.cwd(),
     env: process.env,
@@ -59,6 +59,7 @@ export function runBinaryCapture(
 
   return {
     status: result.status,
+    error: result.error ?? undefined,
     stdout: result.stdout ?? '',
     stderr: result.stderr ?? ''
   };

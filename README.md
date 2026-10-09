@@ -150,6 +150,9 @@ oscd build --no-clean
 
 `--analyze` runs Custom Elements Manifest analysis before the TypeScript build. Analysis is not run by default.
 
+Analysis excludes `demo`, `dist`, and `coverage` recursively, along with
+`*.spec.ts` and `*.test.ts` files at any depth.
+
 `oscd clean`
 
 Removes generated build output from `dist`, while preserving snapshot output.
@@ -213,6 +216,8 @@ flow, e.g. a `postinstall`-free periodic job or a local `npm run update` script.
 `oscd install-hooks`
 
 Installs the Git hooks expected by the tooling package.
+
+Git configuration errors are reported rather than treated as an unset hooks path.
 
 `oscd install-playwright`
 

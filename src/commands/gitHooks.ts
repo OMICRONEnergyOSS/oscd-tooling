@@ -22,6 +22,15 @@ const preCommitCommand = "npx --no -- oscd lint-staged";
 export function getStatus(): GitHooksStatus {
   const result = runBinaryCapture("git", ["config", "--get", "core.hooksPath"]);
 
+  if (result.error) {
+    throw new Error(`Failed to read Git hooksPath: ${result.error.message}`);
+  }
+  if (result.status !== 0 && result.status !== 1) {
+    throw new Error(
+      `Failed to read Git hooksPath (return code ${result.status ?? "unknown"}): ${result.stderr.trim()}`,
+    );
+  }
+
   const hooksPath = result.status === 0 ? result.stdout.trim() : null;
 
   const commitMsgHookPath = path.join(

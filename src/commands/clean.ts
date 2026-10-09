@@ -6,6 +6,6 @@ const rimrafBin = resolvePackageBin("rimraf", "rimraf");
 export async function clean() { 
   runNodeScriptAndExit(rimrafBin, [
     "--glob",
-    "'dist/!(__snapshots__)'",
+    "dist/!(__snapshots__)",
   ], "Clean (dist)"); 
 }

@@ -5,7 +5,7 @@ const cemBin = resolvePackageBin("@custom-elements-manifest/analyzer", "cem");
 
 export async function analyze() {
   runNodeScriptAndExit(cemBin, [
-    "analyze", "--litelement", "--exclude", "demo/*", "--exclude", "dist/* ", "--exclude", "*.spec.ts", "--exclude", "*.test.ts", "--exclude", "coverage/*",
+    "analyze", "--litelement", "--exclude", "demo/**", "--exclude", "dist/**", "--exclude", "**/*.spec.ts", "--exclude", "**/*.test.ts", "--exclude", "coverage/**",
   ],
   "Web Component Analyser");
 }
