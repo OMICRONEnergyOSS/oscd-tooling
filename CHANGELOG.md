@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.7](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.6...oscd-tooling-v0.0.7) (2026-10-12)
+
+
+### Bug Fixes
+
+* add missing globals dependency ([5043623](https://github.com/OMICRONEnergyOSS/oscd-tooling/commit/504362335bbed4211852ef4daeeacba57696453f))
+* correct CLI globs and surface Git configuration errors ([6c45d53](https://github.com/OMICRONEnergyOSS/oscd-tooling/commit/6c45d53ac9aab0d25108c425d9ecb5a4af1731e6))
+* test:watch - tsc needs to watch for changes too ([9bcab95](https://github.com/OMICRONEnergyOSS/oscd-tooling/commit/9bcab95db741bc7eda8aecff410696b2be6c7275))
+
 ## [0.0.6](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.5...oscd-tooling-v0.0.6) (2026-09-18)
 
 
