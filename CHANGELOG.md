@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.7...oscd-tooling-v0.0.8) (2026-10-12)
+
+
+### Bug Fixes
+
+* pinned playwright back to 1.59.1 ([484a139](https://github.com/OMICRONEnergyOSS/oscd-tooling/commit/484a1398ac45d11ac859003f269a6f33e9b71692))
+
 ## [0.0.7](https://github.com/OMICRONEnergyOSS/oscd-tooling/compare/oscd-tooling-v0.0.6...oscd-tooling-v0.0.7) (2026-10-12)
 
 
