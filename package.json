@@ -94,6 +94,7 @@
     "eslint-plugin-tsdoc": "^0.5.4",
     "eslint-plugin-wc": "^3.1.0",
     "gh-pages": "^6.3.0",
+    "globals": "^17.13.0",
     "lint-staged": "^17.6.0",
     "npm-check-updates": "^23.1.0",
     "pixelmatch": "^8.0.0",
