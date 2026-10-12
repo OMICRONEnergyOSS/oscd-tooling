@@ -292,6 +292,10 @@ The base config also centralizes test type visibility, such as Mocha globals, th
 resolve their target versions from `configs/ncurc.config.js`, a shared
 [npm-check-updates](https://github.com/raineorshine/npm-check-updates) config.
 
+In this repository, `npm run updates` interactively selects and applies dependency
+upgrades; `npm run update` runs that same interactive selection, then `npm install`.
+Both exclude Playwright explicitly as well as through the shared policy.
+
 By default, `ncu` proposes the `latest` version of every dependency, major bumps
 included. `latest` is not always safe: a dependency's newest major release can be
 incompatible with the rest of the toolchain even though `ncu` has no way to know that.
@@ -301,6 +305,10 @@ on npm is already `7.x` (the new native/Go compiler) - blindly taking that upgra
 breaks linting outright. TypeScript is pinned to `~6.0.3`, the newest release that still
 satisfies typescript-eslint's peer range, with a `~` (patch-only) range so it can't
 silently drift to the unsupported `6.1.x`.
+
+Playwright is pinned exactly to `1.59.1` and excluded from automatic updates
+with `reject: ['playwright']`. Upgrade it deliberately alongside consumers'
+Playwright CI images.
 
 `configs/ncurc.config.js` encodes this as a small, explicit, per-package `target`
 function: most packages default to `latest`, but a short, curated list is held back
@@ -323,7 +331,7 @@ This is only a default, not a hard requirement. Consumers can drop their own
 // ncurc.config.js
 import base from '@omicronenergy/oscd-tooling/configs/ncurc.config.js';
 
-export default { ...base, reject: ['some-pinned-package'] };
+export default { ...base, reject: [...base.reject, 'some-pinned-package'] };
 ```
 
 ## Dependency Model

@@ -42,12 +42,12 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc -w",
-    "test": "npm run build && node --test test/*.test.mjs",
+    "test": "npm run build && node --test test/*.test.js",
     "prepublishOnly": "npm run build",
     "lint": "eslint . --ext .ts",
     "format": "eslint . --fix",
-    "updates": "ncu --configFilePath ./configs --configFileName ncurc.config.js",
-    "update": "ncu --configFilePath ./configs --configFileName ncurc.config.js --upgrade && npm install"
+    "updates": "ncu --configFilePath ./configs --configFileName ncurc.config.js --interactive --reject playwright",
+    "update": "npm run updates && npm install"
   },
   "keywords": [
     "oscd",
@@ -98,7 +98,7 @@
     "lint-staged": "^17.6.0",
     "npm-check-updates": "^23.1.0",
     "pixelmatch": "^8.0.0",
-    "playwright": "1.64.0",
+    "playwright": "1.59.1",
     "pngjs": "^7.0.0",
     "prettier": "^3.9.9",
     "rimraf": "^6.1.3",

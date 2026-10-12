@@ -7,7 +7,7 @@
 //   - import and spread this config to extend it with project-specific overrides:
 //
 //       import base from '@omicronenergy/oscd-tooling/configs/ncurc.config.js';
-//       export default { ...base, reject: ['some-pinned-package'] };
+//       export default { ...base, reject: [...base.reject, 'some-pinned-package'] };
 //
 // Policy: packages default to ncu's own `latest` target. A short, curated list of
 // packages is held to `minor` (patch/minor only, no major bump) because a major bump
@@ -45,5 +45,7 @@ const HELD_BACK = {
 };
 
 export default {
+  // Keep browser binaries aligned with consumers' pinned Playwright CI images.
+  reject: ["playwright"],
   target: (packageName) => HELD_BACK[packageName] ?? "latest",
 };
