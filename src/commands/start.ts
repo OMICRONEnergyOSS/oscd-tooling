@@ -1,14 +1,10 @@
-import { runNodeScriptAndExit } from "../core/runBinary.js";
+import { nodeCommand, runNodeScriptAndExit } from "../core/runBinary.js";
 import { resolvePackageBin } from "../core/resolver.js";
 import { build, BuildOptions } from "./build.js";
 
 const concurrentlyBin = resolvePackageBin("concurrently", "concurrently");
 const tscBin = resolvePackageBin("typescript", "tsc");
 const wdsBin = resolvePackageBin("@web/dev-server", "wds");
-
-function nodeCommand(bin: string, args: string[] = []): string {
-  return [process.execPath, bin, ...args].map(arg => JSON.stringify(arg)).join(" ");
-}
 
 export interface StartOptions extends BuildOptions {
   build?: boolean;

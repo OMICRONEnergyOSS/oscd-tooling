@@ -182,6 +182,9 @@ oscd test --visual
 oscd test --update
 ```
 
+`--watch` runs the TypeScript compiler and unit test runner in watch mode
+together, so source edits rebuild `dist` and trigger another test run.
+
 `oscd start`
 
 Runs the development build/watch server. Pass `--analyze` to run Custom Elements Manifest analysis before the initial build.

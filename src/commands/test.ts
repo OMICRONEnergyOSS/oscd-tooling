@@ -1,8 +1,10 @@
-import { runNodeScriptAndExit } from "../core/runBinary.js";
+import { nodeCommand, runNodeScriptAndExit } from "../core/runBinary.js";
 import { resolvePackageBin, resolveToolConfig } from "../core/resolver.js";
 import { build } from "./build.js";
 
 const wtrBin = resolvePackageBin("@web/test-runner", "wtr");
+const tscBin = resolvePackageBin("typescript", "tsc");
+const concurrentlyBin = resolvePackageBin("concurrently", "concurrently");
 const config = resolveToolConfig("web-test-runner.config.js");
 
 export interface TestOptions {
@@ -12,7 +14,7 @@ export interface TestOptions {
 }
 
 export async function testCmd(options: TestOptions= {}) {
-  build();
+  await build();
   if (options.visual || options.update){
 
     runNodeScriptAndExit(wtrBin, [
@@ -24,13 +26,23 @@ export async function testCmd(options: TestOptions= {}) {
       ...(options.update ? ["--update-visual-baseline"]:[])
     ], `Visual Regression Testing ${options.update ? "(updating baseline)":""}`);
   }else {
-    runNodeScriptAndExit(wtrBin, [
+    const args = [
       "--config",
       config,
       "--group",
       "unit",
       "--coverage",
       ...(options.watch ? ["--watch"]:[])
-    ], `Unit Testing`);
+    ];
+    if (options.watch) {
+      runNodeScriptAndExit(concurrentlyBin, [
+        "-k",
+        "-r",
+        nodeCommand(tscBin, ["--watch", "--preserveWatchOutput"]),
+        nodeCommand(wtrBin, args),
+      ], "Unit Testing (watch)");
+    } else {
+      runNodeScriptAndExit(wtrBin, args, "Unit Testing");
+    }
   }
 }

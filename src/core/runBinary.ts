@@ -46,6 +46,10 @@ export function runNodeScriptAndExit(script: string, args: string[] = [], label?
   runBinaryAndExit(process.execPath, [script, ...args], label);
 }
 
+export function nodeCommand(bin: string, args: string[] = []): string {
+  return [process.execPath, bin, ...args].map(arg => JSON.stringify(arg)).join(" ");
+}
+
 export function runBinaryCapture(
   command: string,
   args: string[] = []
